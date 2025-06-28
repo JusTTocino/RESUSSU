@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Resumidor Inteligente</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/29/29302.png" type="image/png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f5f7fa;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 2rem 1rem;
+      color: #222;
+    }
+
+    header {
+      max-width: 720px;
+      width: 100%;
+      margin-bottom: 2rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .titulo-selector {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header h1 {
+      font-weight: 600;
+      font-size: 2.4rem;
+      margin: 0;
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    header h1::before {
+      content: "";
+      background-image: url('https://cdn-icons-png.flaticon.com/512/29/29302.png');
+      background-size: contain;
+      width: 32px;
+      height: 32px;
+      display: inline-block;
+    }
+
+    select#selectIdioma {
+      cursor: pointer;
+      border: 1.5px solid #d1d5db;
+      background: white;
+      color: #1f2937;
+      padding: 0.4rem 0.8rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .contenedor {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 1rem;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    aside.anuncios-laterales {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: sticky;
+      top: 10px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    aside.anuncios-laterales img {
+      width: 120px;
+      height: auto;
+      border-radius: 10px;
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+
+    aside.anuncios-laterales img:hover {
+      transform: scale(1.05);
+    }
+
+    aside.izq {
+      align-items: flex-end;
+    }
+
+    aside.der {
+      align-items: flex-start;
+    }
+
+    main {
+      max-width: 720px;
+      width: 100%;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(31, 41, 55, 0.1);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      border-radius: 10px;
+      border: 1.5px solid #d1d5db;
+      padding: 1rem;
+      font-size: 1rem;
+      resize: vertical;
+      font-family: 'Inter', sans-serif;
+    }
+
+    #resultado {
+      background: #eef2ff;
+      padding: 1.5rem;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      min-height: 120px;
+      white-space: pre-wrap;
+      color: #1e293b;
+      user-select: text;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #resumir {
+      background-color: #6366f1;
+      color: white;
+      width: 100%;
+    }
+    #resumir:hover {
+      background-color: #4f46e5;
+    }
+
+    #borrar {
+      background-color: #ef4444;
+      color: white;
+      width: 100%;
+    }
+    #borrar:hover {
+      background-color: #b91c1c;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 12px;
+      border-radius: 10px;
+      background: #d1d5db;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #6366f1;
+      cursor: pointer;
+      border: 2px solid #4f46e5;
+      margin-top: -6px;
+    }
+
+    @media (max-width: 1000px) {
+      aside.anuncios-laterales {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="titulo-selector">
+      <h1>Resumidor Inteligente</h1>
+      <select id="selectIdioma">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+        <option value="fr">Français</option>
+        <option value="de">Deutsch</option>
+        <option value="it">Italiano</option>
+        <option value="pt">Português</option>
+        <option value="ru">Русский</option>
+        <option value="zh">中文</option>
+        <option value="ja">日本語</option>
+        <option value="ko">한국어</option>
+        <option value="ar">العربية</option>
+        <option value="hi">हिन्दी</option>
+        <option value="bn">বাংলা</option>
+        <option value="tr">Türkçe</option>
+        <option value="nl">Nederlands</option>
+        <option value="sv">Svenska</option>
+        <option value="pl">Polski</option>
+        <option value="el">Ελληνικά</option>
+        <option value="he">עברית</option>
+        <option value="vi">Tiếng Việt</option>
+      </select>
+    </div>
+  </header>
+
+  <div class="contenedor">
+    <aside class="anuncios-laterales izq" id="anunciosIzq"></aside>
+
+    <main>
+      <textarea id="inputTexto" placeholder="Pega aquí el texto que deseas resumir..."></textarea>
+
+      <div class="slider-container">
+        <label for="nivelResumen" id="labelNivelResumen">Nivel de resumen: <span id="valorResumen">5</span></label>
+        <input type="range" id="nivelResumen" min="1" max="10" value="5" />
+      </div>
+
+      <button id="resumir">Resumir Texto</button>
+      <button id="borrar">Borrar Todo</button>
+
+      <div id="resultado"></div>
+    </main>
+
+    <aside class="anuncios-laterales der" id="anunciosDer"></aside>
+  </div>
+
+  <script>
+    // Traducciones UI para 20 idiomas
+    const traducciones = {
+      es: {
+        placeholder: "Pega aquí el texto que deseas resumir...",
+        resumir: "Resumir Texto",
+        borrar: "Borrar Todo",
+        nivelResumen: "Nivel de resumen:",
+        alertaNoTexto: "Por favor, ingresa un texto para resumir."
+      },
+      en: {
+        placeholder: "Paste the text you want to summarize here...",
+        resumir: "Summarize Text",
+        borrar: "Clear All",
+        nivelResumen: "Summary level:",
+        alertaNoTexto: "Please enter text to summarize."
+      },
+      fr: {
+        placeholder: "Collez ici le texte que vous souhaitez résumer...",
+        resumir: "Résumer le texte",
+        borrar: "Tout effacer",
+        nivelResumen: "Niveau de résumé :",
+        alertaNoTexto: "Veuillez entrer un texte à résumer."
+      },
+      de: {
+        placeholder: "Fügen Sie hier den Text ein, den Sie zusammenfassen möchten...",
+        resumir: "Text zusammenfassen",
+        borrar: "Alles löschen",
+        nivelResumen: "Zusammenfassungsgrad:",
+        alertaNoTexto: "Bitte geben Sie einen Text zum Zusammenfassen ein."
+      },
+      it: {
+        placeholder: "Incolla qui il testo che vuoi riassumere...",
+        resumir: "Riassumi testo",
+        borrar: "Cancella tutto",
+        nivelResumen: "Livello di sintesi:",
+        alertaNoTexto: "Per favore inserisci un testo da riassumere."
+      },
+      pt: {
+        placeholder: "Cole o texto que deseja resumir aqui...",
+        resumir: "Resumir texto",
+        borrar: "Limpar tudo",
+        nivelResumen: "Nível de resumo:",
+        alertaNoTexto: "Por favor, insira um texto para resumir."
+      },
+      ru: {
+        placeholder: "Вставьте сюда текст, который хотите сократить...",
+        resumir: "Резюмировать текст",
+        borrar: "Очистить всё",
+        nivelResumen: "Уровень сокращения:",
+        alertaNoTexto: "Пожалуйста, введите текст для сокращения."
+      },
+      zh: {
+        placeholder: "在此处粘贴您想要总结的文本...",
+        resumir: "总结文本",
+        borrar: "清除全部",
+        nivelResumen: "摘要级别:",
+        alertaNoTexto: "请输入要总结的文本。"
+      },
+      ja: {
+        placeholder: "ここに要約したいテキストを貼り付けてください...",
+        resumir: "テキストを要約",
+        borrar: "すべてクリア",
+        nivelResumen: "要約レベル:",
+        alertaNoTexto: "要約するテキストを入力してください。"
+      },
+      ko: {
+        placeholder: "요약할 텍스트를 여기에 붙여넣으세요...",
+        resumir: "텍스트 요약",
+        borrar: "모두 지우기",
+        nivelResumen: "요약 수준:",
+        alertaNoTexto: "요약할 텍스트를 입력해주세요."
+      },
+      ar: {
+        placeholder: "الصق النص الذي تريد تلخيصه هنا...",
+        resumir: "تلخيص النص",
+        borrar: "مسح الكل",
+        nivelResumen: "مستوى الملخص:",
+        alertaNoTexto: "يرجى إدخال نص للتلخيص."
+      },
+      hi: {
+        placeholder: "यहाँ वह पाठ चिपकाएँ जिसे आप संक्षेपित करना चाहते हैं...",
+        resumir: "पाठ संक्षेप करें",
+        borrar: "सभी साफ़ करें",
+        nivelResumen: "सारांश स्तर:",
+        alertaNoTexto: "कृपया संक्षेपित करने के लिए पाठ दर्ज करें।"
+      },
+      bn: {
+        placeholder: "এখানে পাঠ্যটি পেস্ট করুন যা আপনি সংক্ষিপ্ত করতে চান...",
+        resumir: "পাঠ্য সংক্ষিপ্ত করুন",
+        borrar: "সব মুছুন",
+        nivelResumen: "সারাংশ স্তর:",
+        alertaNoTexto: "সংক্ষিপ্ত করার জন্য অনুগ্রহ করে পাঠ্য প্রবেশ করুন।"
+      },
+      tr: {
+        placeholder: "Özetlemek istediğiniz metni buraya yapıştırın...",
+        resumir: "Metni Özetle",
+        borrar: "Hepsini Temizle",
+        nivelResumen: "Özet seviyesi:",
+        alertaNoTexto: "Lütfen özetlemek için metin girin."
+      },
+      nl: {
+        placeholder: "Plak hier de tekst die u wilt samenvatten...",
+        resumir: "Tekst samenvatten",
+        borrar: "Alles wissen",
+        nivelResumen: "Samenvattingsniveau:",
+        alertaNoTexto: "Voer tekst in om samen te vatten."
+      },
+      sv: {
+        placeholder: "Klistra in texten du vill sammanfatta här...",
+        resumir: "Sammanfatta text",
+        borrar: "Rensa allt",
+        nivelResumen: "Sammanfattningsnivå:",
+        alertaNoTexto: "Ange text för att sammanfatta."
+      },
+      pl: {
+        placeholder: "Wklej tutaj tekst, który chcesz podsumować...",
+        resumir: "Podsumuj tekst",
+        borrar: "Wyczyść wszystko",
+        nivelResumen: "Poziom podsumowania:",
+        alertaNoTexto: "Wprowadź tekst do podsumowania."
+      },
+      el: {
+        placeholder: "Επικολλήστε εδώ το κείμενο που θέλετε να συνοψίσετε...",
+        resumir: "Περίληψη κειμένου",
+        borrar: "Καθαρισμός όλων",
+        nivelResumen: "Επίπεδο περίληψης:",
+        alertaNoTexto: "Παρακαλώ εισάγετε κείμενο για περίληψη."
+      },
+      he: {
+        placeholder: "הדבק כאן את הטקסט שברצונך לסכם...",
+        resumir: "סכם טקסט",
+        borrar: "נקה הכל",
+        nivelResumen: "רמת סיכום:",
+        alertaNoTexto: "אנא הזן טקסט לסיכום."
+      },
+      vi: {
+        placeholder: "Dán văn bản bạn muốn tóm tắt vào đây...",
+        resumir: "Tóm tắt văn bản",
+        borrar: "Xóa tất cả",
+        nivelResumen: "Cấp độ tóm tắt:",
+        alertaNoTexto: "Vui lòng nhập văn bản để tóm tắt."
+      }
+    };
+
+    // Elementos UI
+    const inputTexto = document.getElementById("inputTexto");
+    const resultado = document.getElementById("resultado");
+    const slider = document.getElementById("nivelResumen");
+    const valorResumen = document.getElementById("valorResumen");
+    const btnResumir = document.getElementById("resumir");
+    const btnBorrar = document.getElementById("borrar");
+    const selectIdioma = document.getElementById("selectIdioma");
+    const labelNivelResumen = document.getElementById("labelNivelResumen");
+
+    // Anuncios: solo imágenes y enlaces, 24 anuncios
+    const anuncios = [
+      {
+        id: "1005005872572582",
+        img: "https://ae-pic-a1.aliexpress-media.com/kf/Sdb887ebeb7434a3688665e375b177968p.png",
+        promoUrl: "https://s.click.aliexpress.com/e/_oopGJAK"
+      },
+      {
+        id: "1005006622023518",
+        img: "https://ae-pic-a1.aliexpress-media.com/kf/S6867854d79754c27bdd318c6e9028b15C.jpg",
+        promoUrl: "https://s.click.aliexpress.com/e/_opr0hK6"
+      },
+      {
+        id: "1005006732120399",
+        img: "https://ae-pic-a1.aliexpress-media.com/kf/S3b5ae211156d4875a98c197951e7127ev.jpg",
+        promoUrl: "https://s.click.aliexpress.com/e/_oBg0MVc"
+      },
+      {
+        id: "1005005016325682",
+        img: "https://ae-pic-a1.aliexpress-media.com/kf/Sf4584cce45ea4f4c9b536bf1991bae445.jpg",
+        promoUrl: "https://s.click.aliexpress.com/e/_oEYqHKw"
+      },
+      {
+        id: "1005006033891567",
+        img: "https://ae-pic-a1.aliexpress-media.com/kf/Scf5e8729eaa94d32ab41674739c5fb28p.jpg",
+        promoUrl: "https://s.click.aliexpress.com/e/_oEwmzuq"
+      },
+      {
+        id: "1005008160111590",
+        img: "https://ae-pic-a1.aliexpress-media.com/kf/Sb800cf8bd28e4376a704e309db600040m.jpg",
+        promoUrl: "https://s.click.aliexpress.com/e/_onVSM7o"
+      },
+      {
+        id: "1005006154086505",
+        img: "https://ae-pic-a1.aliexpress-media.com/kf/S1d4e278b8cdd4ea08147407536d47a72Z.jpg",
+        promoUrl: "https://s.click.aliexpress.com/e/_oFZzKsE"
+      },
+      {
+        id: "1005007156281263",
+        img: "https://ae-pic-a1.aliexpress-media.com/kf/S565b9067baf4485c8b4aad66c8812f2ax.jpg",
+        promoUrl: "https://s.click.aliexpress.com/e/_opo6Q8K"
+      },
+      {
+        id: "1005007297859160",
+        img: "https://ae-pic-a1.aliexpress-media.com/kf/S24c70ece64244d44943c5fce52dc4172m.jpg",
+        promoUrl: "https://s.click.aliexpress.com/e/_oFT7kGE"
+      },  
+    ];
+
+    // Mostrar anuncios alternando en los laterales
+    const anunciosIzq = document.getElementById("anunciosIzq");
+    const anunciosDer = document.getElementById("anunciosDer");
+
+    anuncios.forEach((anuncio, i) => {
+      const enlace = document.createElement("a");
+      enlace.href = anuncio.promoUrl;
+      enlace.target = "_blank";
+      enlace.rel = "noopener noreferrer";
+
+      const img = document.createElement("img");
+      img.src = anuncio.img;
+      img.alt = "Anuncio " + anuncio.id;
+
+      enlace.appendChild(img);
+
+      if (i % 2 === 0) {
+        anunciosIzq.appendChild(enlace);
+      } else {
+        anunciosDer.appendChild(enlace);
+      }
+    });
+
+    // Actualiza UI al cambiar idioma
+    function actualizarIdioma(lang) {
+      const t = traducciones[lang] || traducciones["es"];
+      inputTexto.placeholder = t.placeholder;
+      btnResumir.textContent = t.resumir;
+      btnBorrar.textContent = t.borrar;
+      labelNivelResumen.textContent = t.nivelResumen + " ";
+      valorResumen.textContent = slider.value;
+    }
+
+    // Evento cambio idioma
+    selectIdioma.addEventListener("change", e => {
+      actualizarIdioma(e.target.value);
+    });
+
+    // Mostrar valor slider al cambiar
+    slider.addEventListener("input", () => {
+      valorResumen.textContent = slider.value;
+      // Si quieres que el resumen se actualice automáticamente, podrías llamar a resumirTexto aquí
+    });
+
+    // Función para resumir texto (ejemplo simple: recortar texto según nivel)
+    function resumirTexto() {
+      const texto = inputTexto.value.trim();
+      if (!texto) {
+        alert(traducciones[selectIdioma.value]?.alertaNoTexto || "Por favor, ingresa un texto para resumir.");
+        return;
+      }
+
+      const nivel = parseInt(slider.value, 10);
+      // Simple demo: tomar entre 10% y 90% del texto según nivel
+      const factor = nivel / 10;
+      const maxLen = Math.floor(texto.length * factor);
+
+      // Para evitar cortar en medio de palabra, cortamos en el último espacio antes de maxLen
+      let resumen = texto.slice(0, maxLen);
+      const lastSpace = resumen.lastIndexOf(" ");
+      if (lastSpace > 0) {
+        resumen = resumen.slice(0, lastSpace);
+      }
+
+      resultado.textContent = resumen + (resumen.length < texto.length ? "..." : "");
+    }
+
+    btnResumir.addEventListener("click", resumirTexto);
+
+    btnBorrar.addEventListener("click", () => {
+      inputTexto.value = "";
+      resultado.textContent = "";
+      slider.value = 5;
+      valorResumen.textContent = 5;
+    });
+
+    // Inicializa idioma por defecto
+    actualizarIdioma(selectIdioma.value);
+  </script>
+</body>
+</html>
